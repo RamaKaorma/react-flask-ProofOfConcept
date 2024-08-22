@@ -1,33 +1,34 @@
 from flask import request, jsonify
 from config import app, db
-from models import Contact
+from models import Resource
 
 # Retrieve
-@app.route("/contacts", methods=["GET"]) # This line is the Decorator
-def get_contacts():
-    contacts = Contact.query.all()
-    json_contacts = list(map(lambda x: x.to_json(), contacts))
-    return jsonify({"contacts": json_contacts})
+@app.route("/resources", methods=["GET"]) # This line is the Decorator
+def get_resources():
+    resources = Resource.query.all()
+    json_resources = list(map(lambda x: x.to_json(), resources))
+    return jsonify({"resources": json_resources})
 
 # Create
-@app.route("/create_contact", methods=["POST"])
-def create_contact():
+@app.route("/create_resource", methods=["POST"])
+def create_resource():
     first_name = request.json.get("firstName")
     last_name = request.json.get("lastName")
     email = request.json.get("email")
+    media_link = request.json.get("mediaLink")
 
     # Ensure reqs are met
-    if not first_name or not last_name or not email:
+    if not first_name or not last_name or not email or not media_link:
         return (
-            jsonify({"message": "You must include a first name, last name and email"}),
+            jsonify({"message": "You must include a first name, last name, email and link to media file"}),
             400,
         )
     
-    # Add a new contact
-    new_contact = Contact(first_name=first_name, last_name=last_name, email=email)
+    # Add a new resource
+    new_resource = Resource(first_name=first_name, last_name=last_name, email=email, media_link=media_link)
     try:
-        db.session.add(new_contact) # entered session, ready to enter the database
-        db.session.commit() # enter new_contact into database
+        db.session.add(new_resource) # entered session, ready to enter the database
+        db.session.commit() # enter new_resource into database
     except Exception as e:
         return jsonify({"message": str(e)}), 400
     
@@ -35,17 +36,18 @@ def create_contact():
 
 
 # Update
-@app.route("/update_contact/<int:user_id>", methods=["PATCH"])
-def update_contact(user_id):
-    contact = Contact.query.get(user_id)
+@app.route("/update_resource/<int:user_id>", methods=["PATCH"])
+def update_resource(user_id):
+    resource = Resource.query.get(user_id)
 
-    if not contact:
+    if not resource:
         return jsonify({"message": "User not found"}), 404
     
     data = request.json
-    contact.first_name = data.get("firstName", contact.first_name)
-    contact.last_name = data.get("lastName", contact.last_name)
-    contact.email = data.get("email", contact.email)
+    resource.first_name = data.get("firstName", resource.first_name)
+    resource.last_name = data.get("lastName", resource.last_name)
+    resource.email = data.get("email", resource.email)
+    resource.media_link = data.get("mediaLink", resource.media_link)
 
     db.session.commit()
 
@@ -53,13 +55,13 @@ def update_contact(user_id):
 
 
 # Delete
-@app.route("/delete_contact/<int:user_id>", methods=["DELETE"])
-def delete_contact(user_id):
-    contact = Contact.query.get(user_id)
+@app.route("/delete_resource/<int:user_id>", methods=["DELETE"])
+def delete_resource(user_id):
+    resource = Resource.query.get(user_id)
 
-    if not contact:
+    if not resource:
         return jsonify({"message": "User not found"}), 404
-    db.session.delete(contact)
+    db.session.delete(resource)
     db.session.commit()
 
     return jsonify({"message": "User deleted!"}), 200

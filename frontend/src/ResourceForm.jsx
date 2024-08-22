@@ -2,12 +2,13 @@ import React from 'react';
 import { useState } from 'react';
 import './App.scss';
 
-const ContactForm = ({ existingContact = {}, updateCallback}) => {
-    const [firstName, setFirstName] = useState(existingContact.firstName || "");
-    const [lastName, setLastName] = useState(existingContact.lastName || "");
-    const [email, setEmail] = useState(existingContact.email || "");
+const ResourceForm = ({ existingResource = {}, updateCallback}) => {
+    const [firstName, setFirstName] = useState(existingResource.firstName || "");
+    const [lastName, setLastName] = useState(existingResource.lastName || "");
+    const [email, setEmail] = useState(existingResource.email || "");
+    const [mediaLink, setMediaLink] = useState(existingResource.mediaLink || "")
 
-    const updating = Object.entries(existingContact).length !== 0
+    const updating = Object.entries(existingResource).length !== 0
 
     const onSubmit = async (e) => {
         e.preventDefault() // Don't refresh the page automatically
@@ -15,10 +16,11 @@ const ContactForm = ({ existingContact = {}, updateCallback}) => {
         const data = {
             firstName,
             lastName,
-            email
+            email,
+            mediaLink,
         }
 
-        const url = "http://127.0.0.1:5000/" + (updating ? `update_contact/${existingContact.id}` : "create_contact")
+        const url = "http://127.0.0.1:5000/" + (updating ? `update_resource/${existingResource.id}` : "create_resource")
         const options = {
             method: updating ? "PATCH" : "POST",
             headers: {
@@ -37,7 +39,7 @@ const ContactForm = ({ existingContact = {}, updateCallback}) => {
 
 
     return (
-        <form onSubmit={onSubmit} className='contact-form'>
+        <form onSubmit={onSubmit} className='resource-form'>
             <div className='field'>
                 <label htmlFor="firstName">First Name:</label>
                 <input 
@@ -62,9 +64,17 @@ const ContactForm = ({ existingContact = {}, updateCallback}) => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)} />
             </div>
-            <button type='submit' className='submit-form'>{updating ? "Update" : "Create"} Contact</button>
+            <div className='field'>
+                <label htmlFor="mediaLink">MediaLink:</label>
+                <input 
+                    type="text"
+                    id="mediaLink"
+                    value={mediaLink}
+                    onChange={(e) => setMediaLink(e.target.value)} />
+            </div>
+            <button type='submit' className='submit-form'>{updating ? "Update" : "Create"} Resource</button>
         </form>
     );
 };
 
-export default ContactForm;
+export default ResourceForm;

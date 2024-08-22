@@ -1,54 +1,54 @@
 import { useState, useEffect } from 'react';
 import './App.scss';
-import ContactList from './ContactList';
-import ContactForm from './ContactForm';
+import ResourceList from './ResourceList';
+import ResourceForm from './ResourceForm';
 
 function App() {
-  const [contacts, setContacts] = useState([]);
+  const [resources, setResources] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentContact, setCurrentContact] = useState({});
+  const [currentResource, setCurrentResource] = useState({});
 
 
   useEffect(() => {
-    fetchContacts()
+    fetchResources()
   }, []);
 
 
-  const fetchContacts = async () => {
-    const response = await fetch("http://127.0.0.1:5000/contacts");
+  const fetchResources = async () => {
+    const response = await fetch("http://127.0.0.1:5000/resources");
     const data = await response.json();
-    setContacts(data.contacts);
+    setResources(data.resources);
   }
 
   const closeModal = () => {
     setIsModalOpen(false)
-    setCurrentContact({})
+    setCurrentResource({})
   }
 
   const openCreateModal = () => {
     if (!isModalOpen) setIsModalOpen(true)
   }
 
-  const openEditModal = (contact) => {
+  const openEditModal = (resource) => {
     if (isModalOpen) return
-    setCurrentContact(contact)
+    setCurrentResource(resource)
     setIsModalOpen(true)
   }
 
   const onUpdate = () => {
     closeModal()
-    fetchContacts()
+    fetchResources()
   }
 
   return (
     <>
-      <ContactList contacts={contacts} updateContact={openEditModal} updateCallback={onUpdate}/>
-      <button onClick={openCreateModal} className='create-new-contact'>Create New Contact</button>
+      <ResourceList resources={resources} updateResource={openEditModal} updateCallback={onUpdate}/>
+      <button onClick={openCreateModal} className='create-new-resource'>Create New Resource</button>
       { isModalOpen && 
         <div className='modal'>
           <div className='modal-content'>
             <span className='close' onClick={closeModal}>&times;</span>
-            <ContactForm existingContact={currentContact} updateCallback={onUpdate}/>
+            <ResourceForm existingResource={currentResource} updateCallback={onUpdate}/>
           </div>
         </div>
       }
@@ -57,4 +57,4 @@ function App() {
   )
 }
 
-export default App
+export default App;
